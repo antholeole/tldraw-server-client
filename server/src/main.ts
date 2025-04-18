@@ -1,6 +1,7 @@
 import { tldraw } from "./tldraw/router.ts";
 import Fastify from "fastify";
 import websocketPlugin from "@fastify/websocket";
+import { env } from "./env.ts";
 
 const fastify = Fastify({
 	logger: true,
@@ -15,4 +16,4 @@ fastify.get('/ping', async () => {
 
 
 
-await fastify.listen({ port: 3000 });
+await fastify.listen({ port: env.PORT, host: env.HOSTNAME });
