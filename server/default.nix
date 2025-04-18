@@ -7,7 +7,7 @@ in
     name = "tldraw-server";
     src = ./.;
 
-    npmDepsHash = "sha256-Ooz80vQ9lurmFIMBHJwmIop1rkhPG1+0qPYMvOBllpY=";
+    npmDepsHash = "sha256-MVFtXELNtdYi0P0pTsKAs7Fx/pzzlK2syRTwekEf8rw=";
     dontNpmBuild = true;
 
     installPhase = ''
