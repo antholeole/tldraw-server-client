@@ -2,7 +2,7 @@ import {
 	Tldraw,
 	defaultShapeUtils,
 	defaultBindingUtils,
-	TLAssetStore,
+	type TLAssetStore,
 } from "tldraw";
 import { useSync } from "@tldraw/sync";
 import "./style.css";
@@ -17,7 +17,7 @@ const myAssetStore: TLAssetStore = {
 	},
 };
 
-const uri = `ws://${import.meta.env.VITE_SERVER_URL}/draw/connect`;
+const uri = `${import.meta.env.VITE_SERVER_HTTPS ? "wss" : "ws"}://${import.meta.env.VITE_SERVER_URL}/draw/connect`;
 
 export const TldrawFrontend = () => {
 	const store = useSync({
@@ -29,7 +29,7 @@ export const TldrawFrontend = () => {
 
 	return (
 		<div style={{ position: "fixed", inset: 0 }}>
-			<Tldraw store={store} assetUrls={assets}></Tldraw>
+			<Tldraw store={store} assetUrls={assets} />
 		</div>
 	);
 };

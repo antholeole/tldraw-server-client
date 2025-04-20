@@ -1,6 +1,6 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { fileURLToPath } from "url";
+import { fileURLToPath } from "node:url";
 
 const host = process.env.TAURI_DEV_HOST;
 
@@ -9,9 +9,10 @@ export default defineConfig(async () => {
     plugins: [react()],
 
     build: {
+      base: "",
       rollupOptions: {
         input: {
-          tldraw: fileURLToPath(new URL("./windows/tldraw.html", import.meta.url)),
+          tldraw: fileURLToPath(new URL("./index.html", import.meta.url)),
         }
       }
     },

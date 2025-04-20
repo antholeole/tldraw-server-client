@@ -1,7 +1,7 @@
-import { trace, info, debug, warn, error } from "@tauri-apps/plugin-log";
-
 export const setupLogging = async () => {
-	if (import.meta.env.VITE_VIEWPORT_MODE !== "web") {
+	if (window.__TAURI__) {
+		const { warn, debug, trace, info, error, attachConsole } = window.__TAURI__.log;
+
 		window.console = {
 			...window.console,
 			trace,
@@ -11,6 +11,8 @@ export const setupLogging = async () => {
 			error,
 			log: info,
 		};
+
+		await attachConsole();
 
 		console.info("logging initalized");
 	}
