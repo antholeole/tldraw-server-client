@@ -5,7 +5,7 @@ pkgs: let
   npmDeps = pkgs.fetchNpmDeps {
     name = "${name}-npm-deps-${version}";
     inherit src;
-    hash = "sha256-9eQFCVz/+8wYQjb+JlkydjZCIABEAFxVsI0sY8VE1FU=";
+    hash = "sha256-Uz6vJCP1Bo59hcPQ/JbKtjaXi3RuqkC6TmR5gOkcZXY=";
   };
   configurePhase = ''
     runHook preConfigure
@@ -31,7 +31,12 @@ in {
   client-app = pkgs.rust.packages.stable.rustPlatform.buildRustPackage rec {
     inherit version src npmDeps configurePhase;
     pname = "${name}-app";
-    cargoHash = "sha256-nLfBITr4G+6Y0S+aKZr0PkSXTGwfor4n9g+1Q/Qu6ag=";
+
+    useFetchCargoVendor = true;
+
+    cargoLock.lockFile = ./src-tauri/Cargo.lock;
+    cargoRoot = "src-tauri";
+    buildAndTestSubdir = cargoRoot;
     nativeBuildInputs = with pkgs; [
       cargo-tauri.hook
       nodejs
@@ -49,13 +54,10 @@ in {
     preFixup = ''
       gappsWrapperArgs+=(
         --set WEBKIT_DISABLE_COMPOSITING_MODE 1
-        --prefix XDG_DATA_DIRS : ${pkgs.lib.concatMapStringsSep ":" (x: "${x}/share") [pkgs.gnome.adwaita-icon-theme pkgs.shared-mime-info]}
+        --prefix XDG_DATA_DIRS : ${pkgs.lib.concatMapStringsSep ":" (x: "${x}/share") [pkgs.adwaita-icon-theme pkgs.shared-mime-info]}
         --prefix XDG_DATA_DIRS : ${pkgs.lib.concatMapStringsSep ":" (x: "${x}/share/gsettings-schemas/${x.name}") [pkgs.glib pkgs.gsettings-desktop-schemas pkgs.gtk3]}
         --prefix GIO_EXTRA_MODULES : ${pkgs.glib-networking}/lib/gio/modules
       )
     '';
-
-    cargoRoot = "src-tauri";
-    buildAndTestSubdir = cargoRoot;
   };
 }

@@ -14,9 +14,8 @@
 
       web-frontend = client.frontend-client;
       client-app = client.client-app;
-
-      web-frontend-example = packages.${system}.web-frontend.overrideAttrs {
-        VITE_SERVER_URL = "testing";
+      client-app-example = packages.${system}.client-app.overrideAttrs {
+        VITE_SERVER_URL = "localhost:3000";
       };
     };
 
