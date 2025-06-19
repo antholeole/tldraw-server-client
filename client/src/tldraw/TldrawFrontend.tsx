@@ -7,6 +7,7 @@ import {
 import { useSync } from "@tldraw/sync";
 import "./style.css";
 import { assets } from "./lib/assets";
+import "tldraw/tldraw.css";
 
 const myAssetStore: TLAssetStore = {
 	async upload() {
@@ -28,9 +29,8 @@ export const TldrawFrontend = () => {
 	});
 
 	return (
-		<div style={{ position: "fixed", inset: 0 }}>
+		<div className="tldraw">
 			<Tldraw store={store} assetUrls={assets} />
 		</div>
 	);
 };
-

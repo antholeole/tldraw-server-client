@@ -7,10 +7,14 @@
     system = "x86_64-linux";
     pkgs = import inputs.nixpkgs {inherit system;};
   in rec {
-    packages.${system} = {
+    packages.${system} = let
+      client = (import ./client) pkgs;
+    in {
       tldraw-server = (import ./server) pkgs;
 
-      web-frontend = (import ./client) pkgs;
+      web-frontend = client.frontend-client;
+      client-app = client.client-app;
+
       web-frontend-example = packages.${system}.web-frontend.overrideAttrs {
         VITE_SERVER_URL = "testing";
       };
@@ -20,7 +24,22 @@
       inputsFrom = [
         packages.${system}.tldraw-server
         packages.${system}.web-frontend
+        packages.${system}.client-app
       ];
+
+      # https://github.com/tauri-apps/tauri/issues/5711#issuecomment-1482705393
+      # required for dev tools
+      XDG_DATA_DIRS = let
+        base = pkgs.lib.concatMapStringsSep ":" (x: "${x}/share") [
+          pkgs.adwaita-icon-theme
+          pkgs.shared-mime-info
+        ];
+        gsettings_schema = pkgs.lib.concatMapStringsSep ":" (x: "${x}/share/gsettings-schemas/${x.name}") [
+          pkgs.glib
+          pkgs.gsettings-desktop-schemas
+          pkgs.gtk3
+        ];
+      in "${base}:${gsettings_schema}";
 
       packages = [];
     };

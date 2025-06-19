@@ -1,12 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
-
+import webfontDownload from 'vite-plugin-webfont-dl';
 const host = process.env.TAURI_DEV_HOST;
 
 export default defineConfig(async () => {
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      webfontDownload()
+    ],
 
     build: {
       base: "",

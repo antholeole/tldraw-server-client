@@ -1,65 +1,61 @@
-pkgs: pkgs.buildNpmPackage rec {
-      pname = "home-server-client";
-      version = "1.0.0";
-      src = ./.;
-      npmDeps = pkgs.fetchNpmDeps {
-        name = "${pname}-npm-deps-${version}";
-        inherit src;
-        hash = "sha256-9eQFCVz/+8wYQjb+JlkydjZCIABEAFxVsI0sY8VE1FU=";
-      };
+pkgs: let
+  name = "tldraw-client";
+  version = "1.0.0";
+  src = ./.;
+  npmDeps = pkgs.fetchNpmDeps {
+    name = "${name}-npm-deps-${version}";
+    inherit src;
+    hash = "sha256-9eQFCVz/+8wYQjb+JlkydjZCIABEAFxVsI0sY8VE1FU=";
+  };
+  configurePhase = ''
+    runHook preConfigure
 
-      # TODO: we should validate the env by using something like
-      # https://github.com/Julien-R44/vite-plugin-validate-env
-      # at build time
-      configurePhase = ''
-        env >> .env.production
-      '';
+    env >> .env.production
 
-      buildPhase = ''
-        npm run build:web --base=/
-      '';
+    runHook postConfigure
+  '';
+in {
+  frontend-client = pkgs.buildNpmPackage {
+    inherit version src npmDeps configurePhase;
+    pname = "${name}-web";
 
-      installPhase = ''
-        mv dist/ $out/
-      '';
-    }
+    buildPhase = ''
+      npm run build:web --base=/
+    '';
 
+    installPhase = ''
+      mv dist/ $out/
+    '';
+  };
 
-# {
-#   packages = {
-#     # you should add all env vars found in .env.development to this or else
-#     # it will fail to build.
-#     client-frontend = 
-#     # TODO: move elsewhere
-#     client-app = pkgs.rust.packages.stable.rustPlatform.buildRustPackage rec {
-#       pname = "home-server-client-app";
-#       version = "1.0.0";
-#       cargoHash = "sha256-nLfBITr4G+6Y0S+aKZr0PkSXTGwfor4n9g+1Q/Qu6ag=";
-#       src = ./.;
+  client-app = pkgs.rust.packages.stable.rustPlatform.buildRustPackage rec {
+    inherit version src npmDeps configurePhase;
+    pname = "${name}-app";
+    cargoHash = "sha256-nLfBITr4G+6Y0S+aKZr0PkSXTGwfor4n9g+1Q/Qu6ag=";
+    nativeBuildInputs = with pkgs; [
+      cargo-tauri.hook
+      nodejs
+      npmHooks.npmConfigHook
+      pkg-config
+      wrapGAppsHook4
+    ];
+    buildInputs =
+      [pkgs.openssl]
+      ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [
+        pkgs.glib-networking
+        pkgs.webkitgtk_4_1
+      ];
 
-#       npmDeps = fetchNpmDeps {
-#         name = "${pname}-npm-deps-${version}";
-#         inherit src;
-#         hash = "sha256-oRWShW57FRrzI4NJcjCnN+XOe/bha6GZcWenLdUjS0c=";
-#       };
+    preFixup = ''
+      gappsWrapperArgs+=(
+        --set WEBKIT_DISABLE_COMPOSITING_MODE 1
+        --prefix XDG_DATA_DIRS : ${pkgs.lib.concatMapStringsSep ":" (x: "${x}/share") [pkgs.gnome.adwaita-icon-theme pkgs.shared-mime-info]}
+        --prefix XDG_DATA_DIRS : ${pkgs.lib.concatMapStringsSep ":" (x: "${x}/share/gsettings-schemas/${x.name}") [pkgs.glib pkgs.gsettings-desktop-schemas pkgs.gtk3]}
+        --prefix GIO_EXTRA_MODULES : ${pkgs.glib-networking}/lib/gio/modules
+      )
+    '';
 
-#       nativeBuildInputs = [
-#         cargo-tauri.hook
-#         nodejs
-#         npmHooks.npmConfigHook
-#         pkg-config
-#         wrapGAppsHook4
-#       ];
-
-#       buildInputs =
-#         [openssl]
-#         ++ lib.optionals stdenv.hostPlatform.isLinux [
-#           glib-networking
-#           webkitgtk_4_1
-#         ];
-
-#       cargoRoot = "src-tauri";
-#       buildAndTestSubdir = cargoRoot;
-#     };
-#   };
-# }
+    cargoRoot = "src-tauri";
+    buildAndTestSubdir = cargoRoot;
+  };
+}

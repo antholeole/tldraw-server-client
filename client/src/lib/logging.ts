@@ -1,18 +1,23 @@
-export const setupLogging = async () => {
+export const setupLogging = () => {
 	if (window.__TAURI__) {
-		const { warn, debug, trace, info, error, attachConsole } = window.__TAURI__.log;
+		const { warn, debug, trace, info, error } = window.__TAURI__.log;
 
-		window.console = {
-			...window.console,
-			trace,
-			info,
-			debug,
-			warn,
-			error,
-			log: info,
+		const forwardConsole = (
+			fnName: "log" | "debug" | "info" | "warn" | "error",
+			logger: (message: string) => Promise<void>,
+		) => {
+			const original = console[fnName];
+			console[fnName] = (message) => {
+				original(message);
+				logger(message);
+			};
 		};
 
-		await attachConsole();
+		forwardConsole("log", trace);
+		forwardConsole("debug", debug);
+		forwardConsole("info", info);
+		forwardConsole("warn", warn);
+		forwardConsole("error", error);
 
 		console.info("logging initalized");
 	}
