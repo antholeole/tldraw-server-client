@@ -2,7 +2,6 @@ import { MantineProvider } from "@mantine/core";
 import { setupLogging } from "./lib/logging";
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-
 import "@mantine/core/styles.css";
 import { theme } from "./lib/theme";
 
