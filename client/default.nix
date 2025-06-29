@@ -18,6 +18,7 @@ in {
   frontend-client = pkgs.buildNpmPackage {
     inherit version src npmDeps configurePhase;
     pname = "${name}-web";
+    nodejs = pkgs.nodejs_24;
 
     buildPhase = ''
       npm run build:web --base=/
@@ -39,7 +40,7 @@ in {
     buildAndTestSubdir = cargoRoot;
     nativeBuildInputs = with pkgs; [
       cargo-tauri.hook
-      nodejs
+      nodejs_24
       npmHooks.npmConfigHook
       pkg-config
       wrapGAppsHook4
