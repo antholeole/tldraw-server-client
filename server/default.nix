@@ -5,7 +5,7 @@ pkgs.buildNpmPackage rec {
   name = "tldraw-server";
   src = ./.;
 
-  npmDepsHash = "sha256-MVFtXELNtdYi0P0pTsKAs7Fx/pzzlK2syRTwekEf8rw=";
+  npmDepsHash = "sha256-TzbImtwagskJOLjm45s4mrTT/mVrIkP6D8yFcdZDA+M=";
   dontNpmBuild = true;
 
   installPhase = ''
