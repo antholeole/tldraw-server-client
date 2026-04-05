@@ -5,7 +5,7 @@ pkgs: let
   npmDeps = pkgs.fetchNpmDeps {
     name = "${name}-npm-deps-${version}";
     inherit src;
-    hash = "sha256-SCBGx7RQZ46Hz0Fw5nGR0njQvGC7ySfAR1BSYg8t6Zo=";
+    hash = "sha256-tBdygNcJtdF7gqt5dSaWkbcdVWXN8oZ71Hc0vTroeIk=";
   };
   configurePhase = ''
     runHook preConfigure
